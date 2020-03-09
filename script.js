@@ -12,15 +12,21 @@ let megamanShootingAir = new Image();
 megamanShootingAir.src = "./images/megaman_shooting_air.png";
 let wilyNomral = new Image();
 wilyNomral.src = "./images/wily.png";
+let canvas = document.getElementById("canvas");
+let context = canvas.getContext("2d");
+let shotsMegaman = [];
+let shotsWily = [];
+let requestId = null;
 
 /* game functions */
+
 let gameArea = {
 	ground: 100,
 	frame: 0,
 	start: function() {
 		// console.log("start was called");
 		// setInterval(update, 1000);
-		let requestId = window.requestAnimationFrame(update);
+		update();
 	},
 
 	clear: function() {
@@ -63,8 +69,9 @@ let gameArea = {
 	},
 	checkGameOver: function() {
 		if (megaman.health <= 0 || wily.health <= 0) {
-			gameArea.clear();
-			window.cancelAnimationFrame(requestId);
+			return true;
+		} else {
+			return false;
 		}
 	}
 };
@@ -102,10 +109,43 @@ class Player extends Character {
 		super(100, 1, 60, 0);
 	}
 
-	jump() {
-		if (this.y === 100) {
-			this.isJumping = true;
+	jumpUpdate() {
+		if (this.y > this.maxJumpHigh && this.isJumping === true) {
+			this.y -= 2;
+		} else {
+			this.isJumping = false;
 		}
+		if (this.y < gameArea.ground && this.isJumping === false) {
+			this.y += 2;
+		}
+	}
+
+	drawMegamanPower(shot) {
+		context.lineWidth = 1;
+		context.fillStyle = "white";
+		context.beginPath();
+		context.arc(shot.x, shot.y, 3, 0, 2 * Math.PI);
+		context.fill();
+		context.strokeStyle = "black";
+		context.stroke();
+	}
+
+	shotUpdate() {
+		shotsMegaman.forEach(shot => {
+			if (shot.x <= wily.x) {
+				this.drawMegamanPower(shot);
+				shot.x += 2;
+				// set time to reset normal position image
+				if (shotsMegaman.length > 0 && shotsMegaman[0].x > megaman.x + 60) {
+					megaman.isShooting = false;
+				}
+			}
+			if (shot.x === wily.x - 1) {
+				shotsMegaman.pop();
+				wily.receiveDamage(this.attackDamage);
+				console.log(wily.health);
+			}
+		});
 	}
 }
 
@@ -115,15 +155,44 @@ class Boss extends Character {
 	constructor(health, attackDamage, x, y) {
 		super(health, attackDamage, x, y);
 	}
+	
 	shoot(shooter) {
 		console.log("shoot was called");
 		shotsWily.unshift(
 			new Shot(shooter, this.attackDamage, this.x, this.y + 20 + 40 * Math.floor(Math.random() * 2))
 		);
 	}
-}
 
-/* object to colid */
+	drawWilyPower(shot) {
+		context.lineWidth = 2;
+		context.fillStyle = "red";
+		context.beginPath();
+		context.arc(shot.x, shot.y, 4, 0, 2 * Math.PI);
+		context.fill();
+		context.strokeStyle = "white";
+		context.stroke();
+	}
+
+	shotUpdate() {
+		shotsWily.forEach((shot, i) => {
+			if (
+				shot.x > megaman.x + 20 ||
+				(shot.x < megaman.x && shot.x > 10) ||
+				shot.y > megaman.y + 24 ||
+				shot.y < megaman.y
+			) {
+				this.drawWilyPower(shot);
+				shot.x -= 2;
+			} else if (shot.x === megaman.x + 20 && shot.y <= megaman.y + 24 && shot.y >= megaman.y) {
+				shotsWily.splice(i, 1);
+				megaman.receiveDamage(this.attackDamage);
+				console.log(megaman.health);
+			} else {
+				shotsWily.splice(i, 1);
+			}
+		});
+	}
+}
 
 class Shot {
 	constructor(shooter, damage, x, y) {
@@ -134,104 +203,42 @@ class Shot {
 	}
 }
 
-/* game match */
-
-gameArea.start();
-
-let canvas = document.getElementById("canvas");
-let context = canvas.getContext("2d");
 let megaman = new Player();
 let wily = new Boss(100, 25, 190, 48);
-let shotsMegaman = [];
-let shotsWily = [];
 
 function update() {
 	// <== game engine
 	// console.log("update was called");
-	gameArea.clear();
-	jumpUpdate();
-	shotUpdate();
-	if (gameArea.frame % 80 === 0) wily.shoot("wily"); // wily shot interval
-	gameArea.checkGameOver();
-	window.requestAnimationFrame(update);
-}
-
-function jumpUpdate() {
-	if (megaman.y > megaman.maxJumpHigh && megaman.isJumping === true) {
-		megaman.y -= 2;
+	if (gameArea.checkGameOver()) {
+		gameArea.clear();
+		cancelAnimationFrame(update);
+		console.log("Fim do jogo");
 	} else {
-		megaman.isJumping = false;
+		gameArea.clear();
+		megaman.jumpUpdate();
+		megaman.shotUpdate();
+		wily.shotUpdate();
+		if (gameArea.frame % 80 === 0) wily.shoot("wily"); // wily shot interval
+		console.log(shotsWily);
+		console.log(shotsMegaman);
+		window.requestAnimationFrame(update);
 	}
-	if (megaman.y < gameArea.ground && megaman.isJumping === false) {
-		megaman.y += 2;
-	}
-}
-
-function drawMegamanPower(shot) {
-	context.lineWidth = 1;
-	context.fillStyle = "white";
-	context.beginPath();
-	context.arc(shot.x, shot.y, 3, 0, 2 * Math.PI);
-	context.fill();
-	context.strokeStyle = "black";
-	context.stroke();
-}
-
-function drawWilyPower(shot) {
-	context.lineWidth = 2;
-	context.fillStyle = "red";
-	context.beginPath();
-	context.arc(shot.x, shot.y, 4, 0, 2 * Math.PI);
-	context.fill();
-	context.strokeStyle = "white";
-	context.stroke();
-}
-
-function shotUpdate() {
-	shotsMegaman.forEach(shot => {
-		if (shot.shooter === "megaman") {
-			if (shot.x <= wily.x) {
-				drawMegamanPower(shot);
-				shot.x += 2;
-				// set time to reset normal position image
-				if (shotsMegaman.length > 0 && shotsMegaman[0].x > megaman.x + 60) {
-					megaman.isShooting = false;
-				}
-			}
-			if (shot.x === wily.x - 1) {
-				wily.receiveDamage(megaman.attackDamage);
-				console.log(wily.health);
-			}
-		}
-	});
-	shotsWily.forEach(shot => {
-		if (shot.shooter === "wily") {
-			if (shot.x > megaman.x + 20 || shot.x < megaman.x || shot.y > megaman.y + 24 || shot.y < megaman.y) {
-				drawWilyPower(shot);
-				shot.x -= 2;
-			} else if (
-				shot.x <= megaman.x + 20 &&
-				shot.x >= megaman.x &&
-				shot.y <= megaman.y + 24 &&
-				shot.y >= megaman.y
-			) {
-				shotsWily.shift(shot);
-				megaman.receiveDamage(wily.attackDamage);
-				console.log(megaman.health);
-			}
-		}
-	});
+	// gameArea.checkGameOver();
 }
 
 document.onkeydown = function(e) {
 	switch (e.keyCode) {
 		case 38: // <== up arrow
-			megaman.jump();
+			if (megaman.y === 100) {
+				megaman.isJumping = true;
+			}
 			break;
 		case 39: // <== right arrow
 			megaman.shoot("megaman");
 			megaman.isShooting = true;
-			console.log(shots);
+			break;
+		case 13: // <== enter
+			gameArea.start();
 			break;
 	}
 };

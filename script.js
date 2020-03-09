@@ -1,7 +1,9 @@
 /* images */
 
 let stage = new Image();
-stage.src = "./images/stage.png";
+stage.src = "./images/stage3.jpg";
+let result = new Image();
+result.src = "./images/final.jpg";
 let megamanNormal = new Image();
 megamanNormal.src = "./images/megaman_normal.png";
 let megamanJumping = new Image();
@@ -68,7 +70,14 @@ let gameArea = {
 		}
 	},
 	checkGameOver: function() {
-		if (megaman.health <= 0 || wily.health <= 0) {
+		if (megaman.health <= 0) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+	checkWin: function() {
+		if (wily.health <= 0) {
 			return true;
 		} else {
 			return false;
@@ -181,7 +190,7 @@ class Boss extends Character {
 		shotsWily.forEach((shot, i) => {
 			if (
 				shot.x > megaman.x + 20 ||
-				(shot.x < megaman.x && shot.x > 10) ||
+				(shot.x < megaman.x && shot.x > 1) ||
 				shot.y > megaman.y + 24 ||
 				shot.y < megaman.y
 			) {
@@ -212,9 +221,19 @@ let wily = new Boss(100, 25, 190, 48);
 
 function update() {
 	// <== game engine
-	// console.log("update was called");
+	console.log(wily.health);
 	if (gameArea.checkGameOver()) {
-		gameArea.clear();
+		context.drawImage(result, 0, 0, 300, 150);
+		context.fillStyle = "white";
+		context.font = "20px Arial";
+		context.fillText("Megaman Lose!", 20, 78);
+		cancelAnimationFrame(update);
+		console.log("Fim do jogo");
+	} else if (gameArea.checkWin()) {
+		context.drawImage(result, 0, 0, 300, 150);
+		context.fillStyle = "white";
+		context.font = "20px Arial";
+		context.fillText("Megaman Win!", 20, 78);
 		cancelAnimationFrame(update);
 		console.log("Fim do jogo");
 	} else {

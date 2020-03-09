@@ -88,8 +88,7 @@ class Character {
 		this.isJumping = false;
 		this.maxJumpHigh = 50;
 		this.isShooting = false;
-		// this.speedX = 1;
-		// this.speedY = 1;
+		this.speedX = 0;
 	}
 
 	receiveDamage(damage) {
@@ -107,6 +106,11 @@ class Character {
 class Player extends Character {
 	constructor() {
 		super(100, 1, 60, 0);
+	}
+
+	newPos() {
+		this.x += this.speedX;
+
 	}
 
 	jumpUpdate() {
@@ -155,7 +159,7 @@ class Boss extends Character {
 	constructor(health, attackDamage, x, y) {
 		super(health, attackDamage, x, y);
 	}
-	
+
 	shoot(shooter) {
 		console.log("shoot was called");
 		shotsWily.unshift(
@@ -183,7 +187,7 @@ class Boss extends Character {
 			) {
 				this.drawWilyPower(shot);
 				shot.x -= 2;
-			} else if (shot.x === megaman.x + 20 && shot.y <= megaman.y + 24 && shot.y >= megaman.y) {
+			} else if ((shot.x === megaman.x + 20 || shot.x === megaman.x + 19) && shot.y <= megaman.y + 24 && shot.y >= megaman.y) {
 				shotsWily.splice(i, 1);
 				megaman.receiveDamage(this.attackDamage);
 				console.log(megaman.health);
@@ -214,6 +218,7 @@ function update() {
 		cancelAnimationFrame(update);
 		console.log("Fim do jogo");
 	} else {
+		megaman.newPos()
 		gameArea.clear();
 		megaman.jumpUpdate();
 		megaman.shotUpdate();
@@ -233,7 +238,14 @@ document.onkeydown = function(e) {
 				megaman.isJumping = true;
 			}
 			break;
-		case 39: // <== right arrow
+		case 37: // <== left arrow
+			megaman.speedX = -1;
+			break;
+			case 39: // <== right arrow
+			megaman.speedX = 1;
+			;
+			break;
+		case 32: // <== space bar
 			megaman.shoot("megaman");
 			megaman.isShooting = true;
 			break;
@@ -241,4 +253,8 @@ document.onkeydown = function(e) {
 			gameArea.start();
 			break;
 	}
+};
+
+document.onkeyup = function(e) {
+	megaman.speedX = 0;
 };

@@ -19,6 +19,8 @@ let context = canvas.getContext("2d");
 let shotsMegaman = [];
 let shotsWily = [];
 let requestId = null;
+context.fillStyle = "white"
+context.fillText("Press Enter to Start", 100, 80)
 
 /* game functions */
 
@@ -153,7 +155,7 @@ class Player extends Character {
 					megaman.isShooting = false;
 				}
 			}
-			if (shot.x === wily.x - 1) {
+			if (shot.x === wily.x - 1 || shot.x === wily.x - 2) {
 				shotsMegaman.pop();
 				wily.receiveDamage(this.attackDamage);
 				console.log(wily.health);
@@ -228,14 +230,14 @@ function update() {
 		context.font = "20px Arial";
 		context.fillText("Megaman Lose!", 20, 78);
 		cancelAnimationFrame(update);
-		console.log("Fim do jogo");
+		setInterval(() => window.location.reload(), 3000)
 	} else if (gameArea.checkWin()) {
 		context.drawImage(result, 0, 0, 300, 150);
 		context.fillStyle = "white";
 		context.font = "20px Arial";
 		context.fillText("Megaman Win!", 20, 78);
 		cancelAnimationFrame(update);
-		console.log("Fim do jogo");
+		setInterval(() => window.location.reload(), 3000)
 	} else {
 		megaman.newPos()
 		gameArea.clear();

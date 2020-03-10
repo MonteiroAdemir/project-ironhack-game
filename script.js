@@ -347,7 +347,7 @@ document.onkeydown = function(e) {
 			megaman.direction = "right";
 			break;
 		case 32: // <== space bar
-			if (shotsMegaman.length < 4) {
+			if (shotsMegaman.length < 3) {
 				megaman.shoot("megaman");
 				megaman.isShooting = true;
 			}

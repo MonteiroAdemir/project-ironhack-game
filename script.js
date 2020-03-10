@@ -12,6 +12,19 @@ let megamanShooting = new Image();
 megamanShooting.src = "./images/megaman_shooting.png";
 let megamanShootingAir = new Image();
 megamanShootingAir.src = "./images/megaman_shooting_air.png";
+let walkingCounter = 1;
+let megamanWalking1 = new Image();
+megamanWalking1.src = "./images/megaman_walking1.png";
+let megamanWalking2 = new Image();
+megamanWalking2.src = "./images/megaman_walking2.png";
+let megamanWalking3 = new Image();
+megamanWalking3.src = "./images/megaman_walking3.png";
+let megamanWalkingback1 = new Image();
+megamanWalkingback1.src = "./images/megaman_walkingback1.png";
+let megamanWalkingback2 = new Image();
+megamanWalkingback2.src = "./images/megaman_walkingback2.png";
+let megamanWalkingback3 = new Image();
+megamanWalkingback3.src = "./images/megaman_walkingback3.png";
 let wilyNomral = new Image();
 wilyNomral.src = "./images/wily.png";
 let canvas = document.getElementById("canvas");
@@ -19,8 +32,8 @@ let context = canvas.getContext("2d");
 let shotsMegaman = [];
 let shotsWily = [];
 let requestId = null;
-context.fillStyle = "white"
-context.fillText("Press Enter to Start", 100, 80)
+context.fillStyle = "white";
+context.fillText("Press Enter to Start", 100, 80);
 
 /* game functions */
 
@@ -36,8 +49,59 @@ let gameArea = {
 	clear: function() {
 		gameArea.frame += 1;
 		context.drawImage(stage, 0, 0, 300, 150); // <== print stage
-
-		if (megaman.isShooting && megaman.y < 100) {
+		console.log(walkingCounter);
+		if (walkingCounter === 16) {
+			walkingCounter = 1;
+		}
+		if (megaman.isWalking && megaman.y === 100 && walkingCounter <= 5 && megaman.direction === "left") {
+			// print megaman walking 1
+			context.drawImage(megamanWalkingback1, megaman.x - 1, megaman.y + 2);
+			walkingCounter += 1;
+		} else if (
+			megaman.isWalking &&
+			megaman.y === 100 &&
+			walkingCounter >= 6 &&
+			walkingCounter <= 10 &&
+			megaman.direction === "left"
+		) {
+			// print megaman walking 2
+			context.drawImage(megamanWalkingback2, megaman.x - 1, megaman.y + 2);
+			walkingCounter += 1;
+		} else if (
+			megaman.isWalking &&
+			megaman.y === 100 &&
+			walkingCounter >= 11 &&
+			walkingCounter <= 15 &&
+			megaman.direction === "left"
+		) {
+			// print megaman walking 2
+			context.drawImage(megamanWalkingback3, megaman.x - 1, megaman.y + 2);
+			walkingCounter += 1;
+		} else if (megaman.isWalking && megaman.y === 100 && walkingCounter <= 5 && megaman.direction === "right") {
+			// print megaman walking 1
+			context.drawImage(megamanWalking1, megaman.x - 1, megaman.y + 2);
+			walkingCounter += 1;
+		} else if (
+			megaman.isWalking &&
+			megaman.y === 100 &&
+			walkingCounter >= 6 &&
+			walkingCounter <= 10 &&
+			megaman.direction === "right"
+		) {
+			// print megaman walking 2
+			context.drawImage(megamanWalking2, megaman.x - 1, megaman.y + 2);
+			walkingCounter += 1;
+		} else if (
+			megaman.isWalking &&
+			megaman.y === 100 &&
+			walkingCounter >= 11 &&
+			walkingCounter <= 15 &&
+			megaman.direction === "right"
+		) {
+			// print megaman walking 2
+			context.drawImage(megamanWalking3, megaman.x - 1, megaman.y + 2);
+			walkingCounter += 1;
+		} else if (megaman.isShooting && megaman.y < 100) {
 			// print megaman shooting in the air
 			context.drawImage(megamanShootingAir, megaman.x - 1, megaman.y - 5);
 		} else if (megaman.isShooting) {
@@ -99,6 +163,8 @@ class Character {
 		this.isJumping = false;
 		this.maxJumpHigh = 50;
 		this.isShooting = false;
+		this.isWalking = false;
+		this.direction = "right";
 		this.speedX = 0;
 	}
 
@@ -121,7 +187,6 @@ class Player extends Character {
 
 	newPos() {
 		this.x += this.speedX;
-
 	}
 
 	jumpUpdate() {
@@ -198,7 +263,11 @@ class Boss extends Character {
 			) {
 				this.drawWilyPower(shot);
 				shot.x -= 2;
-			} else if ((shot.x === megaman.x + 20 || shot.x === megaman.x + 19) && shot.y <= megaman.y + 24 && shot.y >= megaman.y) {
+			} else if (
+				(shot.x === megaman.x + 20 || shot.x === megaman.x + 19) &&
+				shot.y <= megaman.y + 24 &&
+				shot.y >= megaman.y
+			) {
 				shotsWily.splice(i, 1);
 				megaman.receiveDamage(this.attackDamage);
 				console.log(megaman.health);
@@ -230,21 +299,29 @@ function update() {
 		context.font = "20px Arial";
 		context.fillText("Megaman Lose!", 20, 78);
 		cancelAnimationFrame(update);
-		setInterval(() => window.location.reload(), 3000)
+		setInterval(() => window.location.reload(), 3000);
 	} else if (gameArea.checkWin()) {
 		context.drawImage(result, 0, 0, 300, 150);
 		context.fillStyle = "white";
 		context.font = "20px Arial";
 		context.fillText("Megaman Win!", 20, 78);
 		cancelAnimationFrame(update);
-		setInterval(() => window.location.reload(), 3000)
+		setInterval(() => window.location.reload(), 3000);
 	} else {
-		megaman.newPos()
+		megaman.newPos();
 		gameArea.clear();
 		megaman.jumpUpdate();
 		megaman.shotUpdate();
 		wily.shotUpdate();
-		if (gameArea.frame % 80 === 0) wily.shoot("wily"); // wily shot interval
+		if (wily.health > 75) {
+			if (gameArea.frame % 80 === 0) wily.shoot("wily");
+		} else if (wily.health > 50) {
+			if (gameArea.frame % 60 === 0) wily.shoot("wily");
+		} else if (wily.health > 25) {
+			if (gameArea.frame % 45 === 0) wily.shoot("wily");
+		} else {
+			if (gameArea.frame % 30 === 0) wily.shoot("wily");
+		}
 		console.log(shotsWily);
 		console.log(shotsMegaman);
 		window.requestAnimationFrame(update);
@@ -261,14 +338,19 @@ document.onkeydown = function(e) {
 			break;
 		case 37: // <== left arrow
 			megaman.speedX = -1;
+			megaman.isWalking = true;
+			megaman.direction = "left";
 			break;
-			case 39: // <== right arrow
+		case 39: // <== right arrow
 			megaman.speedX = 1;
-			;
+			megaman.isWalking = true;
+			megaman.direction = "right";
 			break;
 		case 32: // <== space bar
-			megaman.shoot("megaman");
-			megaman.isShooting = true;
+			if (shotsMegaman.length < 4) {
+				megaman.shoot("megaman");
+				megaman.isShooting = true;
+			}
 			break;
 		case 13: // <== enter
 			gameArea.start();
@@ -278,4 +360,5 @@ document.onkeydown = function(e) {
 
 document.onkeyup = function(e) {
 	megaman.speedX = 0;
+	megaman.isWalking = false;
 };

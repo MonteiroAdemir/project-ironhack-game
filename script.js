@@ -264,9 +264,10 @@ class Boss extends Character {
 				this.drawWilyPower(shot);
 				shot.x -= 2;
 			} else if (
-				(shot.x === megaman.x + 20 || shot.x === megaman.x + 19) &&
-				shot.y <= megaman.y + 24 &&
-				shot.y >= megaman.y
+				shot.x < megaman.x + 40 &&
+				shot.x > megaman.x - 10 &&
+				shot.y < megaman.y + 30 &&
+				shot.y > megaman.y - 20
 			) {
 				shotsWily.splice(i, 1);
 				megaman.receiveDamage(this.attackDamage);
@@ -316,11 +317,11 @@ function update() {
 		if (wily.health > 75) {
 			if (gameArea.frame % 80 === 0) wily.shoot("wily");
 		} else if (wily.health > 50) {
-			if (gameArea.frame % 60 === 0) wily.shoot("wily");
+			if (gameArea.frame % 65 === 0) wily.shoot("wily");
 		} else if (wily.health > 25) {
-			if (gameArea.frame % 45 === 0) wily.shoot("wily");
+			if (gameArea.frame % 50 === 0) wily.shoot("wily");
 		} else {
-			if (gameArea.frame % 30 === 0) wily.shoot("wily");
+			if (gameArea.frame % 35 === 0) wily.shoot("wily");
 		}
 		console.log(shotsWily);
 		console.log(shotsMegaman);

@@ -46,12 +46,14 @@ jumpAudio.src = "./audios/jump_audio.wav";
 let shotAudio = new Audio();
 shotAudio.src = "./audios/shot_audio.wav";
 
+/* canvas and global variables*/
 let canvas = document.getElementById("canvas");
 let context = canvas.getContext("2d");
 let shotsMegaman = [];
 let shotsWily = [];
 let requestId = null;
 let startedGame = false;
+
 window.onload = () => {
 	context.fillStyle = "white";
 	context.fillText("Press Enter to Start", 107, 110);
@@ -64,8 +66,6 @@ let gameArea = {
 	ground: 100,
 	frame: 0,
 	start: function() {
-		// console.log("start was called");
-		// setInterval(update, 1000);
 		startedGame = true;
 		update();
 	},
@@ -126,11 +126,9 @@ class Character {
 	}
 
 	receiveDamage(damage) {
-		console.log("receiveDamage was called");
 		this.health -= damage;
 	}
 	shoot(shooter) {
-		console.log("shoot was called");
 		shotsMegaman.unshift(new Shot(shooter, this.attackDamage, this.x + 35, this.y + 11));
 	}
 }
@@ -160,7 +158,6 @@ class Player extends Character {
 	}
 
 	drawMegaman() {
-		console.log(walkingCounter);
 		if (walkingCounter === 16) {
 			walkingCounter = 1;
 		}
@@ -226,7 +223,6 @@ class Player extends Character {
 			if (shot.x === wily.x - 1 || shot.x === wily.x - 2) {
 				shotsMegaman.pop();
 				wily.receiveDamage(this.attackDamage);
-				console.log(wily.health);
 			}
 		});
 	}
@@ -240,7 +236,6 @@ class Boss extends Character {
 	}
 
 	shoot(shooter) {
-		console.log("shoot was called");
 		shotsWily.unshift(new Shot(shooter, this.attackDamage, this.x, this.y + 20 + 40 * Math.floor(Math.random() * 2)));
 	}
 
@@ -266,7 +261,6 @@ class Boss extends Character {
 			} else if (shot.x < megaman.x + 40 && shot.x > megaman.x - 10 && shot.y < megaman.y + 30 && shot.y > megaman.y - 20) {
 				shotsWily.splice(i, 1);
 				megaman.receiveDamage(this.attackDamage);
-				console.log(megaman.health);
 			} else {
 				shotsWily.splice(i, 1);
 			}
@@ -288,7 +282,6 @@ let wily = new Boss(100, 25, 190, 48);
 
 function update() {
 	// <== game engine
-	console.log(wily.health);
 	if (gameArea.checkGameOver()) {
 		audio3.pause();
 		cancelAnimationFrame(update);
@@ -327,8 +320,6 @@ function update() {
 		} else {
 			if (gameArea.frame % 45 === 0) wily.shoot("wily");
 		}
-		console.log(shotsWily);
-		console.log(shotsMegaman);
 		window.requestAnimationFrame(update);
 	}
 	// gameArea.checkGameOver();
@@ -337,17 +328,20 @@ function update() {
 document.onkeydown = function(e) {
 	switch (e.keyCode) {
 		case 38: // <== up arrow
+		case 87:
 			if (megaman.y === 100) {
 				megaman.isJumping = true;
 				if (!gameArea.checkGameOver() && !gameArea.checkWin()) jumpAudio.play();
 			}
 			break;
 		case 37: // <== left arrow
+		case 65:
 			megaman.speedX = -1;
 			megaman.isWalking = true;
 			megaman.direction = "left";
 			break;
 		case 39: // <== right arrow
+		case 68:
 			megaman.speedX = 1;
 			megaman.isWalking = true;
 			megaman.direction = "right";

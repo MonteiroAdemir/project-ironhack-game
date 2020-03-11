@@ -25,15 +25,34 @@ let megamanWalkingback2 = new Image();
 megamanWalkingback2.src = "./images/megaman_walkingback2.png";
 let megamanWalkingback3 = new Image();
 megamanWalkingback3.src = "./images/megaman_walkingback3.png";
-let wilyNomral = new Image();
-wilyNomral.src = "./images/wily.png";
+let wilyNormal = new Image();
+wilyNormal.src = "./images/wily.png";
+let backgroundCanvas = new Image();
+backgroundCanvas.src = "./images/megaman_title.jpg";
+
+/* audios */
+
+let audio5 = new Audio();
+audio5.src = "./audios/audio5.mp3";
+let audio2 = new Audio();
+audio2.src = "./audios/audio2.mp3";
+let audio3 = new Audio();
+audio3.src = "./audios/audio4.mp3";
+let jumpAudio = new Audio();
+jumpAudio.src = "./audios/jump_audio.wav";
+let shotAudio = new Audio();
+shotAudio.src = "./audios/shot_audio.wav";
+
 let canvas = document.getElementById("canvas");
 let context = canvas.getContext("2d");
 let shotsMegaman = [];
 let shotsWily = [];
 let requestId = null;
-context.fillStyle = "white";
-context.fillText("Press Enter to Start", 100, 80);
+window.onload = () => {
+	context.fillStyle = "white";
+	context.fillText("Press Enter to Start", 107, 110);
+	context.drawImage(backgroundCanvas, 75, 10, 150, 75);
+};
 
 /* game functions */
 
@@ -115,7 +134,7 @@ let gameArea = {
 			context.drawImage(megamanJumping, megaman.x - 1, megaman.y - 5);
 		}
 
-		context.drawImage(wilyNomral, wily.x, wily.y, 65, 75); // <== print wily
+		context.drawImage(wilyNormal, wily.x, wily.y, 65, 75); // <== print wily
 
 		for (let i = 1; i <= megaman.health; i += 1) {
 			if (i % 25 === 0) {
@@ -295,33 +314,38 @@ function update() {
 	// <== game engine
 	console.log(wily.health);
 	if (gameArea.checkGameOver()) {
+		audio3.pause();
+		cancelAnimationFrame(update);
+		audio2.play();
 		context.drawImage(result, 0, 0, 300, 150);
 		context.fillStyle = "white";
 		context.font = "20px Arial";
 		context.fillText("Megaman Lose!", 20, 78);
-		cancelAnimationFrame(update);
-		setInterval(() => window.location.reload(), 3000);
+		setInterval(() => window.location.reload(), 6000);
 	} else if (gameArea.checkWin()) {
+		audio3.pause();
+		cancelAnimationFrame(update);
+		audio5.play();
 		context.drawImage(result, 0, 0, 300, 150);
 		context.fillStyle = "white";
 		context.font = "20px Arial";
-		context.fillText("Megaman Win!", 20, 78);
-		cancelAnimationFrame(update);
-		setInterval(() => window.location.reload(), 3000);
+		context.fillText("You Win!", 60, 78);
+		setInterval(() => window.location.reload(), 6000);
 	} else {
+		audio3.play();
 		megaman.newPos();
 		gameArea.clear();
 		megaman.jumpUpdate();
 		megaman.shotUpdate();
 		wily.shotUpdate();
 		if (wily.health > 75) {
-			if (gameArea.frame % 80 === 0) wily.shoot("wily");
+			if (gameArea.frame % 90 === 0) wily.shoot("wily");
 		} else if (wily.health > 50) {
-			if (gameArea.frame % 65 === 0) wily.shoot("wily");
+			if (gameArea.frame % 75 === 0) wily.shoot("wily");
 		} else if (wily.health > 25) {
-			if (gameArea.frame % 50 === 0) wily.shoot("wily");
+			if (gameArea.frame % 60 === 0) wily.shoot("wily");
 		} else {
-			if (gameArea.frame % 35 === 0) wily.shoot("wily");
+			if (gameArea.frame % 45 === 0) wily.shoot("wily");
 		}
 		console.log(shotsWily);
 		console.log(shotsMegaman);
@@ -335,6 +359,7 @@ document.onkeydown = function(e) {
 		case 38: // <== up arrow
 			if (megaman.y === 100) {
 				megaman.isJumping = true;
+				if (!gameArea.checkGameOver && !gameArea.checkWin) jumpAudio.play();
 			}
 			break;
 		case 37: // <== left arrow
@@ -348,10 +373,11 @@ document.onkeydown = function(e) {
 			megaman.direction = "right";
 			break;
 		case 32: // <== space bar
-			if (shotsMegaman.length < 3) {
-				megaman.shoot("megaman");
-				megaman.isShooting = true;
-			}
+			// if (shotsMegaman.length < 3) {
+			if (!gameArea.checkGameOver && !gameArea.checkWin) shotAudio.play();
+			megaman.shoot("megaman");
+			megaman.isShooting = true;
+			// }
 			break;
 		case 13: // <== enter
 			gameArea.start();

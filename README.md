@@ -2,9 +2,14 @@
 
 ## Screenshots
 
-![Gameplay](screenshots/screenshot1.png)
-![Gameplay](screenshots/screenshot2.png)
 
+
+<div>
+<img width="400px" src="screenshots/screenshot1.png">
+<img width="400px" src="screenshots/screenshot2.png">
+<div/>
+
+  
 ## Installation
 Clone or download this project, open the index.html file in your browser and have Fun.
 

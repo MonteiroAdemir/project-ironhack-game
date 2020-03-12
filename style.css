@@ -1,11 +1,15 @@
-html,
-body {
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+* {
+	font-family: 'Roboto', sans-serif;
 	margin: 0;
 	padding: 0;
+}
+
+body {
 	background-image: url("./images/background4.jpg");
+	background-repeat: no-repeat;
 	background-size: cover;
-	font-family: Arial, Helvetica, sans-serif;
-	/* background-color: black; */
 }
 
 canvas {
@@ -13,6 +17,14 @@ canvas {
 	display: block;
 	border: 2px solid #00000080;
 	box-shadow: 2px 2px 15px #00000080;
-	margin: 60px auto;
-	width: 1000px;
+	/* margin: 60px auto; */
+	width: 800px;
+}
+
+img {
+	height: 70px;
+}
+
+.margin-top {
+	margin-top: 50px;
 }

@@ -17,8 +17,7 @@ canvas {
 	display: block;
 	border: 2px solid #00000080;
 	box-shadow: 2px 2px 15px #00000080;
-	/* margin: 60px auto; */
-	width: 800px;
+	width: 65vw;
 }
 
 img {
